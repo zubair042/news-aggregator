@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Hash;
 class AuthService
 {
     /**
+     * Registers a new user
+     *
      * @param array $data
      * @return array
      */
@@ -28,6 +30,12 @@ class AuthService
         ];
     }
 
+    /**
+     * Authenticates a user using email and password
+     *
+     * @param array $data
+     * @return array|null
+     */
     public function login(array $data): ?array
     {
         $user = User::where('email', $data['email'])->first();
@@ -45,6 +53,14 @@ class AuthService
         ];
     }
 
+    /**
+     * Verifies the current password and updates it
+     *
+     * @param $user
+     * @param string $currentPassword
+     * @param string $newPassword
+     * @return bool
+     */
     public function updatePassword($user, string $currentPassword, string $newPassword): bool
     {
         if (!Hash::check($currentPassword, $user->password)) {
