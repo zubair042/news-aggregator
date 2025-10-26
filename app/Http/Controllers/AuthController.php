@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
 use App\Http\Requests\LoginRequest;
-use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\UpdatePasswordRequest;
 use App\Services\AuthService;
 use Illuminate\Http\JsonResponse;
@@ -19,6 +18,12 @@ class AuthController extends Controller
         $this->authService = $authService;
     }
 
+    /**
+     * Handles user registration
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function register(Request $request): JsonResponse
     {
         try {
@@ -31,6 +36,12 @@ class AuthController extends Controller
         }
     }
 
+    /**
+     * Authenticates the user
+     *
+     * @param LoginRequest $request
+     * @return JsonResponse
+     */
     public function login(LoginRequest $request): JsonResponse
     {
         try {
@@ -44,6 +55,12 @@ class AuthController extends Controller
         }
     }
 
+    /**
+     * Updates the authenticated user's password
+     *
+     * @param UpdatePasswordRequest $request
+     * @return JsonResponse
+     */
     public function updatePassword(UpdatePasswordRequest $request): JsonResponse
     {
         try {
@@ -63,6 +80,12 @@ class AuthController extends Controller
         }
     }
 
+    /**
+     * Logs out the authenticated user
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function logout(Request $request): JsonResponse
     {
         try {

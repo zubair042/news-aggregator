@@ -15,6 +15,11 @@ class GuardianService
         $this->apiKey = config('services.guardian.key');
     }
 
+    /**
+     * Fetches and formats news articles from The Guardian API
+     *
+     * @return array
+     */
     public function fetchArticles(): array
     {
         $response = Http::get("{$this->baseUrl}/search", [

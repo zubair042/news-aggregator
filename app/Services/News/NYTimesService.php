@@ -15,6 +15,11 @@ class NYTimesService
         $this->apiKey = config('services.nytimes.key');
     }
 
+    /**
+     * Fetches and formats news articles from The New York Times API
+     *
+     * @return array
+     */
     public function fetchArticles(): array
     {
         $response = Http::get("{$this->baseUrl}/world.json", [

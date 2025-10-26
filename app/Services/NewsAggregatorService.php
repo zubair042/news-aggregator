@@ -23,6 +23,11 @@ class NewsAggregatorService
         $this->nytimes = $nytimes;
     }
 
+    /**
+     * Fetches articles from all integrated news sources and stores them in the database, updating existing records to prevent duplicates.
+     *
+     * @return void
+     */
     public function fetchAndStore(): void
     {
         $articles = collect()

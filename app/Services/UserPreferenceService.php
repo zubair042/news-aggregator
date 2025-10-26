@@ -7,6 +7,8 @@ use App\Models\UserPreference;
 class UserPreferenceService
 {
     /**
+     * Create or update user preferences in the database.
+     *
      * @param int $userId
      * @param array $data
      * @return UserPreference
