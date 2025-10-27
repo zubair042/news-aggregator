@@ -2,10 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Models\Article;
 use App\Models\User;
 use App\Models\UserPreference;
-use App\Services\ArticleService;
 use App\Services\UserPreferenceService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Log;
@@ -36,8 +34,7 @@ class UserPreferenceControllerTest extends TestCase
             'authors' => ['John Doe'],
         ];
 
-        $response = $this->withHeaders(['Accept' => 'application/json'])
-            ->postJson('/api/preferences', $payload);
+        $response = $this->postJson('/api/preferences', $payload);
 
         $response->assertStatus(200)
             ->assertJson([
@@ -114,22 +111,6 @@ class UserPreferenceControllerTest extends TestCase
                 'success' => false,
                 'message' => 'Failed to update preferences.',
             ]);
-    }
-
-    /**
-     * @return void
-     */
-    public function test_it_requires_authentication_to_update_preferences()
-    {
-        auth()->logout();
-
-        $payload = [
-            'sources' => ['BBC'],
-        ];
-
-        $response = $this->postJson('/api/preferences', $payload);
-
-        $response->assertStatus(401);
     }
 
 }

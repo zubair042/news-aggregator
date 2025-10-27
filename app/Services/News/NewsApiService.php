@@ -33,13 +33,13 @@ class NewsApiService
 
         return collect($response->json('articles', []))
             ->map(fn($article) => [
-                'title' => $article['title'] ?? '',
-                'description' => $article['description'] ?? '',
-                'author' => $article['author'] ?? null,
-                'category' => $article['source']['name'] ?? null,
-                'source' => 'NewsAPI',
-                'url' => $article['url'] ?? '',
-                'published_at' => $article['publishedAt'] ?? now(),
+                'title'         => $article['title'] ?? '',
+                'description'   => $article['description'] ?? '',
+                'author'        => $article['author'] ?? null,
+                'category'      => $article['source']['name'] ?? null,
+                'source'        => 'NewsAPI',
+                'url'           => $article['url'] ?? '',
+                'published_at'  => $article['publishedAt'] ?? now(),
             ])
             ->toArray();
     }

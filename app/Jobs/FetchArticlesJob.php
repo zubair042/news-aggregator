@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Services\NewsAggregatorService;
+use App\Services\ArticleService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Queue\Queueable;
@@ -17,10 +17,10 @@ class FetchArticlesJob implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle(NewsAggregatorService $aggregator): void
+    public function handle(ArticleService $articleService): void
     {
         Log::info('FetchArticlesJob started...');
-        $aggregator->fetchAndStore();
+        $articleService->fetchAndStore();
         Log::info('FetchArticlesJob completed successfully.');
     }
 }

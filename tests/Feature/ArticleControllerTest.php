@@ -7,7 +7,6 @@ use App\Models\User;
 use App\Models\UserPreference;
 use App\Services\ArticleService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Log;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -43,9 +42,11 @@ class ArticleControllerTest extends TestCase
             ])
             ->assertJsonStructure([
                 'data' => [
-                    '*' => ['id', 'title', 'source', 'category', 'author', 'published_at']
-                ],
-                'meta' => ['current_page', 'last_page', 'per_page', 'total']
+                    'articles' => [
+                        '*' => ['id', 'title', 'source', 'category', 'author', 'published_at']
+                    ],
+                    'meta' => ['current_page', 'last_page', 'per_page', 'total']
+                ]
             ]);
     }
 
@@ -60,7 +61,7 @@ class ArticleControllerTest extends TestCase
         $response = $this->getJson('/api/articles?search=Laravel');
 
         $response->assertStatus(200);
-        $data = $response->json('data');
+        $data = $response->json('data.articles');
         $this->assertCount(1, $data);
         $this->assertStringContainsString('Laravel', $data[0]['title']);
     }
@@ -76,7 +77,7 @@ class ArticleControllerTest extends TestCase
         $response = $this->getJson('/api/articles?category=Tech&source=BBC&author=John');
 
         $response->assertStatus(200);
-        $this->assertCount(1, $response->json('data'));
+        $this->assertCount(1, $response->json('data.articles'));
     }
 
     /**
@@ -90,7 +91,7 @@ class ArticleControllerTest extends TestCase
         $response = $this->getJson('/api/articles?from_date=' . now()->subDays(5)->toDateString());
 
         $response->assertStatus(200);
-        $this->assertCount(1, $response->json('data'));
+        $this->assertCount(1, $response->json('data.articles'));
     }
 
     /**
@@ -111,7 +112,7 @@ class ArticleControllerTest extends TestCase
         $response = $this->getJson('/api/articles');
 
         $response->assertStatus(200);
-        $data = $response->json('data');
+        $data = $response->json('data.articles');
         $this->assertCount(1, $data);
         $this->assertEquals('BBC', $data[0]['source']);
     }
@@ -123,7 +124,7 @@ class ArticleControllerTest extends TestCase
     {
         $response = $this->getJson('/api/articles?category=Unknown');
         $response->assertStatus(200);
-        $this->assertEmpty($response->json('data'));
+        $this->assertEmpty($response->json('data.articles'));
     }
 
     /**
@@ -131,8 +132,6 @@ class ArticleControllerTest extends TestCase
      */
     public function test_handles_exceptions_gracefully(): void
     {
-        Log::shouldReceive('error')->once();
-
         $this->mock(ArticleService::class, function ($mock) {
             $mock->shouldReceive('getArticles')->andThrow(new \Exception('Database error'));
         });
@@ -142,7 +141,7 @@ class ArticleControllerTest extends TestCase
         $response->assertStatus(500)
             ->assertJson([
                 'success' => false,
-                'message' => 'Failed to fetch articles',
+                'message' => 'Failed to fetch articles.',
             ]);
     }
 }

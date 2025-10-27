@@ -8,6 +8,7 @@ use App\Http\Requests\UpdatePasswordRequest;
 use App\Services\AuthService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
@@ -29,10 +30,10 @@ class AuthController extends Controller
         try {
             $data = $this->authService->register($request->all());
             return ResponseHelper::apiResponse(true, 'User registered successfully', $data, 201);
-        } catch (\Exception $e) {
-            return ResponseHelper::apiResponse(
-                false, 'An error occurred during registration', null, 500, ['error' => $e->getMessage()]
-            );
+        } catch (ValidationException $e) {
+            return ResponseHelper::apiResponse(false, $e->getMessage(), null, 422, $e->errors());
+        } catch (\Throwable $e) {
+            return ResponseHelper::apiResponse(false, 'Registration failed', null, 500, ['error' => $e->getMessage()]);
         }
     }
 

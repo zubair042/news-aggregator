@@ -3,9 +3,17 @@
 namespace App\Services;
 
 use App\Models\UserPreference;
+use App\Repositories\UserPreferenceRepository;
 
 class UserPreferenceService
 {
+    protected UserPreferenceRepository $preferenceRepository;
+
+    public function __construct(UserPreferenceRepository $preferenceRepository)
+    {
+        $this->preferenceRepository = $preferenceRepository;
+    }
+
     /**
      * Create or update user preferences in the database.
      *
@@ -15,13 +23,12 @@ class UserPreferenceService
      */
     public function updatePreferences(int $userId, array $data): UserPreference
     {
-        return UserPreference::updateOrCreate(
-            ['user_id' => $userId],
-            [
-                'sources' => $data['sources'] ?? [],
-                'categories' => $data['categories'] ?? [],
-                'authors' => $data['authors'] ?? [],
-            ]
-        );
+        return $this->preferenceRepository->updatePreferences($userId, $data);
     }
+
+    public function getPreferences(int $userId): ?UserPreference
+    {
+        return $this->preferenceRepository->getByUserId($userId);
+    }
+
 }

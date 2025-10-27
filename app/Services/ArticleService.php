@@ -4,11 +4,33 @@ namespace App\Services;
 
 use App\Models\Article;
 use App\Models\UserPreference;
+use App\Repositories\ArticleRepository;
+use App\Services\News\GuardianService;
+use App\Services\News\NewsApiService;
+use App\Services\News\NYTimesService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class ArticleService
 {
+    protected ArticleRepository $articleRepository;
+    protected NewsApiService $newsApi;
+    protected GuardianService $guardian;
+    protected NYTimesService $nytimes;
+
+    public function __construct(
+        ArticleRepository $articleRepository,
+        NewsApiService    $newsApi,
+        GuardianService   $guardian,
+        NYTimesService    $nytimes
+    )
+    {
+        $this->articleRepository = $articleRepository;
+        $this->newsApi = $newsApi;
+        $this->guardian = $guardian;
+        $this->nytimes = $nytimes;
+    }
+
     /**
      * Retrieve paginated list of articles based on filters and user preferences.
      *
@@ -18,113 +40,34 @@ class ArticleService
      */
     public function getArticles(array $filters, $user = null): LengthAwarePaginator
     {
-        $query = Article::query();
-
-        $this->applySearchFilters($query, $filters);
-        $this->applyCategorySourceAuthorFilters($query, $filters);
-        $this->applyDateFilters($query, $filters);
-
-        if ($user) {
-            $this->applyUserPreferences($query, $user);
-        }
-
-        return $query->latest('published_at')->paginate(10);
+        return $this->articleRepository->getArticles($filters, $user);
     }
 
     /**
-     * Apply search filters for title and description.
+     * Fetches articles from all integrated news sources and stores them in the database
      *
-     * @param Builder $query
-     * @param array $filters
      * @return void
      */
-    private function applySearchFilters(Builder $query, array $filters): void
+    public function fetchAndStore(): void
     {
-        if (!empty($filters['search'])) {
-            $query->where(function (Builder $q) use ($filters) {
-                $q->where('title', 'like', '%' . $filters['search'] . '%')
-                    ->orWhere('description', 'like', '%' . $filters['search'] . '%');
-            });
+        $articles = collect()
+            ->merge($this->newsApi->fetchArticles())
+            ->merge($this->guardian->fetchArticles())
+            ->merge($this->nytimes->fetchArticles());
+
+        foreach ($articles as $data) {
+            $this->articleRepository->createIfNotExists($data);
         }
     }
 
     /**
-     * Apply category, source, and author filters.
+     * Get Article record by ID
      *
-     * @param Builder $query
-     * @param array $filters
-     * @return void
+     * @param int $id
+     * @return Article|null
      */
-    private function applyCategorySourceAuthorFilters(Builder $query, array $filters): void
+    public function getArticleById(int $id): ?Article
     {
-        if (!empty($filters['category'])) {
-            $query->where('category', $filters['category']);
-        }
-
-        if (!empty($filters['source'])) {
-            $query->where('source', $filters['source']);
-        }
-
-        if (!empty($filters['author'])) {
-            $query->where('author', $filters['author']);
-        }
+        return $this->articleRepository->getArticleById($id);
     }
-
-    /**
-     * Apply date range filters for published articles.
-     *
-     * @param Builder $query
-     * @param array $filters
-     * @return void
-     */
-    private function applyDateFilters(Builder $query, array $filters): void
-    {
-        if (!empty($filters['from_date'])) {
-            $query->whereDate('published_at', '>=', $filters['from_date']);
-        }
-
-        if (!empty($filters['to_date'])) {
-            $query->whereDate('published_at', '<=', $filters['to_date']);
-        }
-    }
-
-    /**
-     * Apply filters based on the user's saved preferences.
-     *
-     * @param Builder $query
-     * @param $user
-     * @return void
-     */
-    private function applyUserPreferences(Builder $query, $user): void
-    {
-        $prefs = UserPreference::where('user_id', $user->id)->first();
-
-        if ($prefs) {
-            if (!empty($prefs->sources)) {
-                $sources = is_string($prefs->sources)
-                    ? json_decode($prefs->sources, true)
-                    : $prefs->sources;
-
-                $query->whereIn('source', $sources);
-            }
-
-            if (!empty($prefs->categories)) {
-                $categories = is_string($prefs->categories)
-                    ? json_decode($prefs->categories, true)
-                    : $prefs->categories;
-
-                $query->whereIn('category', $categories);
-            }
-
-            if (!empty($prefs->authors)) {
-                $authors = is_string($prefs->authors)
-                    ? json_decode($prefs->authors, true)
-                    : $prefs->authors;
-
-                $query->whereIn('author', $authors);
-            }
-        }
-    }
-
-
 }

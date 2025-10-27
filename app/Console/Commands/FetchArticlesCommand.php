@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use App\Jobs\FetchArticlesJob;
-use App\Services\NewsAggregatorService;
 use Illuminate\Console\Command;
 
 class FetchArticlesCommand extends Command
