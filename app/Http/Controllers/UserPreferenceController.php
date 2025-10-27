@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ResponseHelper;
 use App\Http\Requests\UserPreferenceRequest;
 use App\Http\Resources\UserPreferenceResource;
 use App\Services\UserPreferenceService;
@@ -24,17 +25,17 @@ class UserPreferenceController extends Controller
      * @param UserPreferenceRequest $request
      * @return JsonResponse
      */
-    public function update(UserPreferenceRequest $request): JsonResponse
+    public function setPreferences(UserPreferenceRequest $request): JsonResponse
     {
         try {
             $user = Auth::user();
             $preferences = $this->preferenceService->updatePreferences($user->id, $request->validated());
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Preferences updated successfully.',
-                'data' => new UserPreferenceResource($preferences),
-            ]);
+            return ResponseHelper::apiResponse(
+                true,
+                'Preferences updated successfully.',
+                new UserPreferenceResource($preferences)
+            );
         } catch (\Throwable $e) {
             Log::error('Failed to update user preferences: ' . $e->getMessage(), [
                 'user_id' => Auth::id(),
@@ -42,12 +43,55 @@ class UserPreferenceController extends Controller
                 'trace' => $e->getTraceAsString(),
             ]);
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to update preferences.',
-                'data' => null,
-                'error' => $e->getMessage(),
-            ], 500);
+            return ResponseHelper::apiResponse(
+                false,
+                'Failed to update preferences.',
+                null,
+                500,
+                $e->getMessage()
+            );
         }
     }
+
+    /**
+     * Retrieve the authenticated user's news preferences.
+     *
+     * @return JsonResponse
+     */
+    public function getPreferences(): JsonResponse
+    {
+        try {
+            $user = Auth::user();
+            $preferences = $this->preferenceService->getPreferences($user->id);
+
+            if (!$preferences) {
+                return ResponseHelper::apiResponse(
+                    true,
+                    'No preferences found.',
+                    null
+                );
+            }
+
+            return ResponseHelper::apiResponse(
+                true,
+                'Preferences retrieved successfully.',
+                new UserPreferenceResource($preferences)
+            );
+        } catch (\Throwable $e) {
+            Log::error('Failed to retrieve user preferences: ' . $e->getMessage(), [
+                'user_id' => Auth::id(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return ResponseHelper::apiResponse(
+                false,
+                'Failed to retrieve preferences.',
+                null,
+                500,
+                $e->getMessage()
+            );
+        }
+    }
+
+
 }

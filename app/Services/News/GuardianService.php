@@ -34,13 +34,13 @@ class GuardianService
 
         return collect($response->json('response.results', []))
             ->map(fn($item) => [
-                'title' => $item['webTitle'] ?? '',
-                'description' => $item['fields']['trailText'] ?? '',
-                'author' => $item['fields']['byline'] ?? null,
-                'category' => $item['sectionName'] ?? null,
-                'source' => 'The Guardian',
-                'url' => $item['webUrl'] ?? '',
-                'published_at' => $item['webPublicationDate'] ?? now(),
+                'title'         => $item['webTitle'] ?? '',
+                'description'   => $item['fields']['trailText'] ?? '',
+                'author'        => $item['fields']['byline'] ?? null,
+                'category'      => $item['sectionName'] ?? null,
+                'source'        => 'The Guardian',
+                'url'           => $item['webUrl'] ?? '',
+                'published_at'  => $item['webPublicationDate'] ?? now(),
             ])
             ->toArray();
     }
