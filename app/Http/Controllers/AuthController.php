@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
 use App\Http\Requests\LoginRequest;
+use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\UpdatePasswordRequest;
 use App\Services\AuthService;
 use Illuminate\Http\JsonResponse;
@@ -20,12 +21,12 @@ class AuthController extends Controller
     }
 
     /**
-     * Handles user registration
+     * Register a new user
      *
-     * @param Request $request
+     * @param RegisterRequest $request
      * @return JsonResponse
      */
-    public function register(Request $request): JsonResponse
+    public function register(RegisterRequest $request): JsonResponse
     {
         try {
             $data = $this->authService->register($request->all());

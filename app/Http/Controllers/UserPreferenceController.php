@@ -20,7 +20,7 @@ class UserPreferenceController extends Controller
     }
 
     /**
-     * Update the authenticated user's news preferences.
+     * Update user's news preferences.
      *
      * @param UserPreferenceRequest $request
      * @return JsonResponse
@@ -54,7 +54,7 @@ class UserPreferenceController extends Controller
     }
 
     /**
-     * Retrieve the authenticated user's news preferences.
+     * Get user's news preferences.
      *
      * @return JsonResponse
      */
