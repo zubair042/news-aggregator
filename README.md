@@ -1,7 +1,7 @@
 
 ## News Aggregator API
 
-The News Aggregator API is a Laravel 12-based application designed to provide a comprehensive solution for managing user authentication, articles, user preferences, and data aggregation. This application adopts a clean architecture with separate service and repository layers for streamlined business logic and database interaction management.
+The News Aggregator API is a Laravel 12–based application built to deliver a complete solution for handling user authentication, article management, user preferences, and data aggregation. It follows a clean architecture pattern, separating the service and repository layers to ensure well-structured business logic and efficient database interaction.
 
 ---
 
