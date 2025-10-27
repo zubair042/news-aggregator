@@ -19,7 +19,7 @@ class ArticleController extends Controller
     }
 
     /**
-     * Fetch a paginated list of articles based on filters and user preferences.
+     * List articles.
      *
      * @param ArticleFilterRequest $request
      * @return JsonResponse
