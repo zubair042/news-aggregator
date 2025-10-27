@@ -98,7 +98,7 @@ Ensure the following are installed on your system:
 
 ### **API Documentation**
 Once the server is running, open your browser and navigate to:
-```bash
+    ```bash
 http://localhost:8000/docs/api
 
 ---
@@ -108,4 +108,5 @@ http://localhost:8000/docs/api
 To run the test cases, execute the following command in the terminal:
 ```bash
 php artisan test
+
 
